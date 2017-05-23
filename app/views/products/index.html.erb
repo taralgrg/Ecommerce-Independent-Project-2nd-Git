@@ -1,0 +1,168 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Watches an E-Commerce online Shopping Category Flat Bootstrap Responsive Website Template| Home :: w3layouts</title>
+
+
+<link href="css/bootstrap.css" rel='stylesheet' type='text/css' />
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<!-- Custom Theme files -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href='http://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
+
+	<link rel="stylesheet" href="css/reset.css"> <!-- CSS reset -->
+	<link rel="stylesheet" href="css/style.css"> <!-- Gem style -->
+	<script src="js/modernizr.js"></script> <!-- Modernizr -->
+<!-- start menu -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="https://github.com/kswedberg/jquery-smooth-scroll/blob/master/jquery.smooth-scroll.min.js"></script>
+<script>
+$('.smooth').on('click', function() {
+    $.smoothScroll({
+        scrollElement: $('body'),
+        scrollTarget: '#' + this.id
+    });
+
+    return false;
+});
+</script>
+
+<!-- Navbar -->
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">Elegant Touch</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Home</a></li>
+        <li><%= link_to "Watches", products_path %></li>
+        <li><a href="#">Page 3</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <!-- <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+        <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li> -->
+        <% if user_signed_in? %>
+          <li>
+          <%= link_to('Logout', destroy_user_session_path, :method => :delete) %><span class="glyphicon glyphicon-user"></span>
+          </li>
+        <% else %>
+          <li>
+          <%= link_to('Login', new_user_session_path)  %><span class="glyphicon glyphicon-log-in"></span>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  <!-- Grid box -->
+
+  <ul class="rig columns-3">
+
+
+            <% @products.each do |product| %>
+              <li>
+                <%= link_to product_path(product) do %>
+                    <%= image_tag product.image.url(:thumb) %>
+                <% end %>
+                <h3><%= product.name %></h3>
+                <p><%= product.price %> $</p>
+
+                <p><%= product.description %></p>
+
+
+            <% end %>
+
+          </li>
+
+  </ul>
+
+
+  <!-- Grid box end -->
+
+
+
+
+
+
+
+
+
+
+
+
+<h1>Products</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Price</th>
+      <th>Name</th>
+      <th>Description</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @products.each do |product| %>
+      <tr>
+        <td><%= product.price %> $</td>
+        <td><%= product.name %></td>
+        <td><%= image_tag product.image.url(:thumb) %></td>
+        <td><%= product.description %></td>
+        <td><%= link_to 'Show', product %></td>
+        <td><%= link_to 'Edit', edit_product_path(product) %></td>
+        <td><%= link_to 'Destroy', product, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Product', new_product_path %>
+
+<% @products.each do |product| %>
+   <p><%= product.name %> | <%= number_to_currency product.price %>
+   <%= form_for @order_item do |f| %>
+     <%= f.hidden_field :product_id, value: product.id %>
+     <%= f.number_field :quantity %>
+     <%= f.submit "Add to cart" %>
+   <% end %>
+ <% end %>
+
+
+ <% if @order_items.any? %>
+     <% @order_items.each do |item| %>
+       <p><%= item.product.name %> | <%= link_to "Delete", order_item_path(item), :data => {:confirm => "You sure?", :method => "delete"} %></p>
+       <p> Unit Price: <%= number_to_currency item.product.price %> | Quantity: <%= item.quantity %> | Total Price: <%= number_to_currency (item.product.price * item.quantity) %></p>
+     <% end %>
+     <p>Your Total: <%= number_to_currency current_order.total_price %></p>
+     <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+             data-key="<%= Rails.configuration.stripe[:publishable_key] %>"
+             data-description="A month's subscription"
+             data-amount=<%= current_order.total_price * 100%>
+             data-locale="auto"></script>
+   <% else %>
+     <p>Your shopping cart is empty.</p>
+   <% end %>
