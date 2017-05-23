@@ -77,7 +77,7 @@ $('.smooth').on('click', function() {
 
   <!-- Grid box -->
 
-  <ul class="rig columns-3">
+  <ul class="rig columns-5">
 
 
             <% @products.each do |product| %>
@@ -85,7 +85,16 @@ $('.smooth').on('click', function() {
                 <%= link_to product_path(product) do %>
                     <%= image_tag product.image.url(:thumb) %>
                 <% end %>
-                <h3><%= product.name %></h3>
+
+								<%= button_to "Edit", edit_product_path(product),
+								      :class => "btn1", :method => :get %>
+								<%= button_to 'Delete', product,:class => "btn3", method: :delete, data: { confirm: 'Are you sure?' } %>
+							</div>
+                <h3>
+									<%= link_to product_path(product) do %>
+	                    <%= product.name %>
+	                <% end %>
+								</h3>
                 <p><%= product.price %> $</p>
 
                 <p><%= product.description %></p>
@@ -98,8 +107,9 @@ $('.smooth').on('click', function() {
   </ul>
 
 
-  <!-- Grid box end -->
 
+
+  <!-- Grid box end -->
 
 
 
