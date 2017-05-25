@@ -10,6 +10,10 @@ class ProductsController < ApplicationController
     @order_items = current_order.order_items
   end
 
+  def user
+    @user = User.find(current_user.id)
+  end
+
   # GET /products/1
   # GET /products/1.json
   def show
@@ -29,7 +33,7 @@ class ProductsController < ApplicationController
   # POST /products.json
   def create
     @product = Product.new(product_params)
-
+    @product.user_id = current_user.id
     respond_to do |format|
       if @product.save
         format.html { redirect_to @product, notice: 'Product was successfully created.' }

@@ -29,7 +29,13 @@
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="https://github.com/kswedberg/jquery-smooth-scroll/blob/master/jquery.smooth-scroll.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
 <script>
+
 $('.smooth').on('click', function() {
     $.smoothScroll({
         scrollElement: $('body'),
@@ -58,9 +64,63 @@ $('.smooth').on('click', function() {
         <li><%= link_to "Watches", products_path %></li>
         <li><a href="#">Page 3</a></li>
       </ul>
+
+
       <ul class="nav navbar-nav navbar-right">
         <!-- <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
         <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li> -->
+				<!-- Single button -->
+	<div class="dropdown">
+	        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Dropdown <b class="caret"></b></a>
+	        <ul class="dropdown-menu">
+
+						<table>
+							 <caption>Your Cart:</caption>
+						 <tr>
+						 <th>Item</th>
+						 <th>Unit Price</th>
+						 <th>Quantity</th>
+						 <th>Total</th>
+						 </tr>
+						 <% if @order_items.any? %>
+								<% @order_items.each do |item| %>
+						 <tr>
+							 <td>
+								 <p><%= item.product.name %> | <%= link_to "Delete", order_item_path(item), :data => {:confirm => "You sure?", :method => "delete"} %>
+							 </td>
+							 <td>
+								 <%= number_to_currency item.product.price %>
+							 </td>
+							 <td>
+								 <%= item.quantity %>
+							 </td>
+							 <td>
+								 <%= number_to_currency (item.product.price * item.quantity) %>
+							 </td>
+						 </tr>
+						 <%end%>
+						</table>
+						 <p>Your Total: <%= number_to_currency current_order.total_price %></p>
+						 <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+										 data-key="<%= Rails.configuration.stripe[:publishable_key] %>"
+										 data-description="A month's subscription"
+										 data-amount=<%= current_order.total_price * 100%>
+										 data-locale="auto"></script>
+						 <% else %>
+						 <p>Your shopping cart is empty.</p>
+						 <% end %>
+
+	        </ul>
+	    </div>
+		</div>
+</div>
+
+
+
+
+
+
+
         <% if user_signed_in? %>
           <li>
           <%= link_to('Logout', destroy_user_session_path, :method => :delete) %><span class="glyphicon glyphicon-user"></span>
@@ -76,35 +136,61 @@ $('.smooth').on('click', function() {
 </nav>
 
   <!-- Grid box -->
+	<% @products.in_groups_of(5, false).each do |group| %>
+	  <div class='row'>
+	    <% group.each do |product| %>
+	      <div class='col-md-2 item'>
+					<%= link_to product_path(product) do %>
+							<%= image_tag product.image.url(:thumb) %>
+							<% end %>
+	        <h3><%= product.name %></h3>
+	        <div><%=number_to_currency product.price%></div>
+					<div class="button-edit">
+					<%= button_to "Edit", edit_product_path(product),
+								:class => "btn1", :method => :get %>
+						<%= button_to 'Delete', product,:class => "btn3", method: :delete, data: { confirm: 'Are you sure?' } %>
+						<%= button_to "New Product", new_product_path,
+									:class => "btn1", :method => :get %>
+						   <p><%= product.name %> | <%= number_to_currency product.price %>
+						   <%= form_for @order_item do |f| %>
+						     <%= f.hidden_field :product_id, value: product.id %>
+						     <%= f.number_field :quantity %>
+						     <%= f.submit "Add to cart" %>
+						 <% end %></div>
+	      </div>
+	    <% end %>
+	  </div>
+	<% end %>
 
-  <ul class="rig columns-5">
+	<!-- <div class="row">
 
+									<% @products.each do |product| %>
 
-            <% @products.each do |product| %>
-              <li>
-                <%= link_to product_path(product) do %>
-                    <%= image_tag product.image.url(:thumb) %>
-                <% end %>
-
-								<%= button_to "Edit", edit_product_path(product),
-								      :class => "btn1", :method => :get %>
-								<%= button_to 'Delete', product,:class => "btn3", method: :delete, data: { confirm: 'Are you sure?' } %>
-							</div>
-                <h3>
-									<%= link_to product_path(product) do %>
-	                    <%= product.name %>
+	              <div class="row col-xs-6">
+	                <%= link_to product_path(product) do %>
+	                    <%= image_tag product.image.url(:thumb) %>
 	                <% end %>
-								</h3>
-                <p><%= product.price %> $</p>
+								</div>
+						</div>
+								 <div class="row  col-sx-12">
+									<%= button_to "Edit", edit_product_path(product),
+									      :class => "btn1", :method => :get %>
+									<%= button_to 'Delete', product,:class => "btn3", method: :delete, data: { confirm: 'Are you sure?' } %>
+								</div>
+							 <div class="row col-sx-12">
+										<%= link_to product_path(product) do %>
+		                    <%= product.name %>
+		                <% end %>
 
-                <p><%= product.description %></p>
-
-
-            <% end %>
-
-          </li>
-
-  </ul>
+	                <%= product.price %> $
+								</div>
+								<div class="row  col-sx-12">
+	                <%= product.description %>
+								</div>
+	          	</ul>
+						<%end%>
+					</div>
+</div> -->
 
 
 
@@ -121,7 +207,7 @@ $('.smooth').on('click', function() {
 
 
 
-<h1>Products</h1>
+<!-- <h1>Products</h1>
 
 <table>
   <thead>
@@ -148,9 +234,9 @@ $('.smooth').on('click', function() {
   </tbody>
 </table>
 
-<br>
+<br> -->
 
-<%= link_to 'New Product', new_product_path %>
+<!-- <%= link_to 'New Product', new_product_path %>
 
 <% @products.each do |product| %>
    <p><%= product.name %> | <%= number_to_currency product.price %>
@@ -175,4 +261,4 @@ $('.smooth').on('click', function() {
              data-locale="auto"></script>
    <% else %>
      <p>Your shopping cart is empty.</p>
-   <% end %>
+   <% end %> -->
